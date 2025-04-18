@@ -1,0 +1,101 @@
+<div id="documentation" class="product-documentation__doc-text"><div id="anchor-about" data-anchor="anchor-about" class="product-documentation__anchor"><h1>About</h1><div class="documentation-parent-content"></div><section data-anchor="anchor-database" id="anchor-database" class="product-documentation__anchor"><h2>Database</h2><div class="documentation-markdown"><p>This database provides institutional investor holdings data through a simple and easy to access interface.</p>
+<p>Coverage:</p>
+<ul>
+<li>25,000+ issuers and 10,000 institutional investors</li>
+<li>9 years of history, with quarterly observation frequency for the last 5 years</li>
+<li>Covers all types of securities reported, categorized into: common shares, funds, calls, puts, warrants, preferred stock, and debt</li>
+</ul>
+<p>Data is sourced from SEC form 13F filings, which requires that medium to large institutional investment managers report details of certain US security holdings. More information on SEC form 13F reporting can be found <a href="https://www.sec.gov/divisions/investment/13ffaq.htm">here</a>.</p>
+<p>See the examples and <a href="/data/SF3/documentation?anchor=getting-started">get started</a> now.</p></div></section><section data-anchor="anchor-publisher" id="anchor-publisher" class="product-documentation__anchor"><h2>Publisher</h2><div class="documentation-markdown"><p>Sharadar is an independent research and analytics firm founded in 2013.  Sharadar specializes in extraction, standardization and organization of financial data from company filings.  We combine people, software and rigorous review processes to generate accurate, professional grade data for professional investors and analysts.</p></div></section></div><div id="anchor-getting-started" data-anchor="anchor-getting-started" class="product-documentation__anchor"><h1>Getting Started</h1><div class="documentation-parent-content"></div><section data-anchor="anchor-getting-started" id="anchor-getting-started" class="product-documentation__anchor"><h2>Getting Started</h2><div class="documentation-markdown"><p>This database has 3 separate tables:</p>
+<ul>
+<li>SF3: is the most detailed view of the data with a single line item for each combination of ticker, investor, quarter, and security type</li>
+<li>SF3A: provides summary statistics aggregated by ticker and quarter</li>
+<li>SF3B: provides summary statistics aggregated by investor and quarter</li>
+</ul></div></section><section data-anchor="anchor-sf3-examples" id="anchor-sf3-examples" class="product-documentation__anchor"><h2>SF3 Examples</h2><div class="documentation-markdown"><p>We'll demonstrate how to access the database, using filters to specify which data to retrieve. We'll start off with a compound example that uses multiple filters, then a series of simple examples that you can combine to your requirements in order to produce more complex queries.</p>
+<h3>1. Compound Example</h3>
+<p>The following request will retrieve the top 10 reported holders of AAPL shares as at 2015-12-31:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;ticker=AAPL&amp;calendardate=2015-12-31&amp;securitytype=SHR&amp;qopts.per_page=10</code></p>
+<h3>2. Authentication</h3>
+<p>All requests to the new API must be authenticated with your API key which can be found in account settings, <a href="/account/profile">here</a>.</p>
+<h3>3. Ticker</h3>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;ticker=AAPL</code></p>
+<h3>4. Data Format</h3>
+<p>csv:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;ticker=AAPL</code></p>
+<p>json:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3.json?api_key=4REPYvYN6PkUD57Cgy31&amp;ticker=AAPL</code></p>
+<p>xml:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3.xml?api_key=4REPYvYN6PkUD57Cgy31&amp;ticker=AAPL</code></p>
+<h3>5. Investor</h3>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;investorname=VANGUARD GROUP INC</code></p>
+<h3>6. Date (and Ticker)</h3>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;ticker=AAPL&amp;calendardate=2015-12-31</code></p>
+<h3>7. Security Type (and Ticker)</h3>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;ticker=AAPL&amp;securitytype=SHR</code></p>
+<h3>8. Operators</h3>
+<p>Data can retrieved based on greater than (gt), less than (lt), greater than or equal to (gte) or less than or equal to (lte) operators.</p>
+<p>For example, the following request retrieves all specified ticker data where the calendar date is greater than or equal to 2015-12-31:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;ticker=AAPL&amp;calendardate.gte=2015-12-31</code></p>
+<p>The operators can be applied to the filter columns: <code>ticker</code>, <code>investorid</code>, <code>calendardate</code> and <code>securitytype</code>.</p>
+<h3>9. Indicators (and Ticker)</h3>
+<p>You can limit the indicators (columns) retrieved as follows:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;ticker=AAPL&amp;qopts.columns=ticker,calendardate,value,units</code></p>
+<h3>10. Top N Observations</h3>
+<p>Data is stored sorted in descending order by date (CalendarDate) and Value. Therefore to retrieve the Top N items you can utilize the <code>qopts.per_page</code> parameter. The following example will retrieve the top 10 reported holdings of any ticker, by any investor as at 2015-12-31:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;calendardate=2015-12-31&amp;qopts.per_page=10</code></p>
+<p>If unspecified the default number of rows per call is 10,000.</p></div></section><section data-anchor="anchor-sf3a-examples" id="anchor-sf3a-examples" class="product-documentation__anchor"><h2>SF3A Examples</h2><div class="documentation-markdown"><h3>1. Compound Example</h3>
+<p>The following request will retrieve the total number of institutional holders of AAPL shares as at 2015-12-31:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3A.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;ticker=AAPL&amp;calendardate=2015-12-31&amp;qopts.columns=calendardate,ticker,shrholders</code></p>
+<h3>2. Ticker</h3>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3A.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;ticker=AAPL</code></p>
+<h3>3. Date</h3>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3A.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;calendardate=2015-12-31</code></p></div></section><section data-anchor="anchor-sf3b-examples" id="anchor-sf3b-examples" class="product-documentation__anchor"><h2>SF3B Examples</h2><div class="documentation-markdown"><h3>1. Compound Example</h3>
+<p>The following request will retrieve the total number of share holdings by Vanguard as at 2015-12-31:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3B.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;investorname=VANGUARD GROUP INC&amp;calendardate=2015-12-31&amp;qopts.columns=calendardate,investorname,shrholdings</code></p>
+<h3>2. Investor</h3>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3B.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;investorname=VANGUARD GROUP INC</code></p>
+<h3>3. Date</h3>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3B.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;calendardate=2015-12-31</code></p></div></section></div><div id="anchor-batch-download" data-anchor="anchor-batch-download" class="product-documentation__anchor"><h1>Batch Download</h1><div class="documentation-parent-content"></div><section data-anchor="anchor-batch-download" id="anchor-batch-download" class="product-documentation__anchor"><h2>Batch Download</h2><div class="documentation-markdown"><p>Subscribers can download the entire database at anytime. First, access one of the following URLs:</p>
+<p>For the primary <code>SF3</code> table:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3.csv?qopts.export=true&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>For the <code>SF3A</code> table (summary by ticker):</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3A.csv?qopts.export=true&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>For the <code>SF3B</code> table (summary by investor):</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3B.csv?qopts.export=true&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>This will return comma-separated text that includes a file status code. If the status code is "creating", "generating" or "regenerating" then wait a minute or two and try again. When the status code is "fresh" then use the url that is also returned in the csv text in order to retrieve the bulk download.</p>
+<p>In addition you can add other arguments to filter the data that is retrieved through this batch process, as described in the <a href="/data/SF3/documentation?anchor=getting-started">docs</a>.</p></div></section></div><div id="anchor-sample-data" data-anchor="anchor-sample-data" class="product-documentation__anchor"><h1>Sample Data</h1><div class="documentation-parent-content"></div><section data-anchor="anchor-sample-data" id="anchor-sample-data" class="product-documentation__anchor"><h2>Sample Data</h2><div class="documentation-markdown"><p>Free sample data, for the quarter ending <code>2015-12-31</code>, is provided to all Nasdaq Data Link users. See the <a href="/data/SF3/documentation?anchor=getting-started">Getting Started</a> for usable examples.</p></div></section></div><div id="anchor-notes-and-issues" data-anchor="anchor-notes-and-issues" class="product-documentation__anchor"><h1>Notes and Issues</h1><div class="documentation-parent-content"></div><section data-anchor="anchor-notes-and-issues" id="anchor-notes-and-issues" class="product-documentation__anchor"><h2>Notes and Issues</h2><div class="documentation-markdown"><ul>
+<li>
+<p>Data is sourced from SEC form 13F filings, which require that medium to large institutional investment managers report details of certain US security holdings. This means that the database may not contain: the smaller investors in a particular security; 100% of the securities that an investor holds; and the large investors in a small security if that investor is not large enough to be subject to SEC form 13F disclosure. More information on SEC form 13F reporting can be found <a href="https://www.sec.gov/divisions/investment/13ffaq.htm">here</a>.</p>
+</li>
+<li>
+<p>Reporting by large managers is generally of high quality, however, there is a small percentage of reporting errors that are made. We identify and correct many but not all of these, and are continuously improving our efforts to do so where possible.</p>
+</li>
+<li>
+<p>Where errors are made, the reporting investment manager may restate their prior holdings. We will update our records accordingly and always present the most up to date record of holdings for a particular period.</p>
+</li>
+<li>
+<p>The reporting deadline is 45 days after the end of the quarter. For example by May 15th for the quarter ending March 31st. As such the most recent quarter holdings is typically incomplete until the end of this 45 day deadline as a high percentage of investors report their holdings as late as possible.</p>
+</li>
+<li>
+<p>On very limited occasions investors may have permission to delay disclosure of certain new holdings, for example Berkshire Hathaway has done so in the past. This means that from time-to-time there is a small window after the 45 day reporting deadline where newly reported data is incomplete for a particular investor, until they report the new holdings.</p>
+</li>
+<li>
+<p>Investors occasionally report securities where either the issuer or share class are unidentifiable. Generally this is the case when the investor is reporting securities which are not required to be reported to the SEC, eg for private companies or for foreign listed stocks. We assign these the <code>UND</code> security type, and the ticker <code>U10D</code>.</p>
+</li>
+<li>
+<p>Data is currently not adjusted for stock splits.</p>
+</li>
+</ul></div></section></div><div id="anchor-api-libraries" data-anchor="anchor-api-libraries" class="product-documentation__anchor"><h1>API/Libraries</h1><div class="documentation-parent-content"></div><section data-anchor="anchor-overview" id="anchor-overview" class="product-documentation__anchor"><h2>Overview</h2><div class="documentation-markdown"><p>The full Sharadar Fundamentals database is accessible via the Nasdaq Data Link API.  The database is also available via Nasdaq Data Link's free libraries for <a href="/help/r">R</a>, <a href="/help/python">Python</a>, <a href="/help/matlab">Matlab</a>, <a href="/help/excel">Excel</a> and <a href="/help/libraries">other tools</a>.</p>
+<p>For complete API documentation, see <a href="/help/api">docs.data.nasdaq.com</a></p></div></section><section data-anchor="anchor-see-also" id="anchor-see-also" class="product-documentation__anchor"><h2>See Also</h2><div class="documentation-markdown"><p>For more information:</p>
+<ul>
+<li><a href="/help/api">General Nasdaq Data Link API Documentation</a></li>
+<li><a href="/help/libraries">Nasdaq Data Link Libraries</a></li>
+</ul></div></section></div><div id="anchor-support" data-anchor="anchor-support" class="product-documentation__anchor"><h1>Support</h1><div class="documentation-parent-content"></div><section data-anchor="anchor-email" id="anchor-email" class="product-documentation__anchor"><h2>Email</h2><div class="documentation-markdown"><p>Premium support is available for subscribers to this database:</p>
+<ul>
+<li>
+<p>Database-specific: <a href="mailto:vincent@sharadar.com">vincent@sharadar.com</a></p>
+</li>
+<li>
+<p>Nasdaq Data Link platform/tools: <a href="mailto:clientsuccess@nasdaq.com">clientsuccess@nasdaq.com</a></p>
+</li>
+</ul></div></section></div><div id="usage" data-anchor="usage" class="product-documentation__anchor"><div id="quick-start-examples" data-anchor="quick-start-examples"><h1>API Usage</h1><nav class="usage-examples-navigation"><div class="nav-option nav-option-selected"><span class="usage-nav-text">API</span><img alt="API" class="usage-nav-icon" src="https://next-pro.cdn.data.nasdaq.com/assets/images/product/usage/api-black.svg"></div><div class="nav-option "><span class="usage-nav-text">Python</span><img alt="Python" class="usage-nav-icon" src="https://next-pro.cdn.data.nasdaq.com/assets/images/product/usage/python-grey.svg"></div><div class="nav-option "><span class="usage-nav-text">R</span><img alt="R" class="usage-nav-icon" src="https://next-pro.cdn.data.nasdaq.com/assets/images/product/usage/r-grey.svg"></div><div class="nav-option "><span class="usage-nav-text">Excel</span><img alt="Excel" class="usage-nav-icon" src="https://next-pro.cdn.data.nasdaq.com/assets/images/product/usage/excel-grey.svg"></div></nav><div class="usage-container"><h4 class="usage-heading">Getting started with the API</h4><div class="usage-subscribe-free-sample-container"><div class="usage-subscribe-free-sample-div"><h5>Free sample enabled</h5><p>A subset of this data is available for testing without a subscription. To view the full data, you must subscribe to the product.</p><a class="guest-pricing-pri-button">Subscribe</a></div></div><div class="usage-section__examples-text"><h2>Usage Examples</h2><p>You can try any of these API calls by pasting them into your browser window. Users with programming experience can use wget or curl to run these calls from the command line.</p><p>The usage examples below pull sample columns from the available data. To view a list of all filterable columns and their descriptions, visit the data product documentation tab.</p></div><div class="usage-code__section"><h2>Filter by a single date and ticker</h2><div class="usage-section__example">https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3?calendardate=2018-09-30&amp;ticker=ZZZOF&amp;api_key=<span style="color: rgb(0, 191, 63);">4REPYvYN6PkUD57Cgy31</span></div><h2>Filter by a single date and multiple ticker</h2><div class="usage-section__example">https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3?calendardate=2018-09-30%2C2018-06-30%2C2018-03-31&amp;ticker=ZZZOF%2CZZZ%2CZYXI&amp;api_key=<span style="color: rgb(0, 191, 63);">4REPYvYN6PkUD57Cgy31</span></div><h2>Filter by multiple date and multiple ticker</h2><div class="usage-section__example">https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF3?calendardate=2018-09-30%2C2018-06-30%2C2018-03-31&amp;ticker=ZZZOF%2CZZZ%2CZYXI&amp;api_key=<span style="color: rgb(0, 191, 63);">4REPYvYN6PkUD57Cgy31</span></div></div><div class="usage-documentation-container"><h4>Full API Reference</h4><p>For an in-depth look at how to use Nasdaq Data Link’s API, please consult our full documentation.</p><a href="https://docs.data.nasdaq.com/docs/tables-1" class="guest-pricing-pri-button">View the docs</a></div></div></div><div id="data-export" data-anchor="data-export"><h1>Data Export</h1><div class="data-export-section__unsub-container"><p>Full data only available to subscribers</p><a class="guest-pricing-pri-button">Subscribe</a></div><h2>Only Available for Subscribers</h2><p>This section can be used to download an entire table once subscribed. The output format is always the same: a single zipped CSV file of the entire table.</p></div></div></div>
