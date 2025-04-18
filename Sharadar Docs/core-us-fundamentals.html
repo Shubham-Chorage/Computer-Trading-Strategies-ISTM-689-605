@@ -1,0 +1,254 @@
+<div id="documentation" class="product-documentation__doc-text"><div id="anchor-about" data-anchor="anchor-about" class="product-documentation__anchor"><h1>About</h1><div class="documentation-parent-content"></div><section data-anchor="anchor-database" id="anchor-database" class="product-documentation__anchor"><h2>Database</h2><div class="documentation-markdown"><p>Updated daily, this database provides up to 24 years of history, for 150 essential fundamental indicators and financial ratios, for more than 16,000 US public companies. Includes detailed corporate actions data. This is reference grade fundamental stock data.</p>
+<p>Key features:</p>
+<ul>
+<li>More than 6,000 active and 10,000 delisted companies.</li>
+<li>Continuously expanding ticker and indicator coverage, and history extensions (more <a href="/databases/SF1?anchor=coverage#anchor-progress">here</a>).</li>
+<li>Data including or excluding restatements.</li>
+<li>Point-in-time dimension to data with time-indexing to the filing date or the fiscal/report period.</li>
+<li>Includes foreign issuers (ADRs and Canadian) that trade publicly on US markets.</li>
+<li>Annual, Trailing Twelve month, and Quarterly (domestic-only) datasets available.</li>
+<li>Personalised support with direct contact with the principal data curator.</li>
+<li>Lowest cost single user and developer licenses for professional fundamental data in the world.</li>
+<li>Free preview access; use this data <a href="https://data.nasdaq.com/databases/SF1">right now</a>.</li>
+<li>Works with the <a href="/databases/SF1?anchor=coverage#anchor-api-and-library-helpers">Nasdaq Data Link API and all Nasdaq Data Link libraries</a></li>
+</ul></div></section><section data-anchor="anchor-publisher" id="anchor-publisher" class="product-documentation__anchor"><h2>Publisher</h2><div class="documentation-markdown"><p>Sharadar is an independent research and analytics firm founded in 2013.  Sharadar specializes in extraction, standardization and organization of financial data from company filings.  We combine people, software and processes to generate accurate, professional grade data for professional investors and analysts.</p></div></section></div><div id="anchor-progress" data-anchor="anchor-progress" class="product-documentation__anchor"><h1>Progress</h1><div class="documentation-parent-content"><p>This database is continuously expanding to cover more tickers, more indicators and to provide more history. Here we chart our progress in expanding the database:</p>
+<p><img src="http://www.sharadar.com/meta/History.png" alt=""></p>
+<p><img src="http://www.sharadar.com/meta/Tickers.png" alt=""></p>
+<p><img src="http://www.sharadar.com/meta/Indicators.png" alt=""></p></div></div><div id="anchor-getting-started" data-anchor="anchor-getting-started" class="product-documentation__anchor"><h1>Getting Started</h1><div class="documentation-parent-content"></div><section data-anchor="anchor-getting-started" id="anchor-getting-started" class="product-documentation__anchor"><h2>Getting Started</h2><div class="documentation-markdown"><p>Let's get started with a few basic examples of how to access the data using the various tools that are available to you: the Web API, Python, R, and Excel.</p>
+<p>There are 7 tables associated with this database. You can see these tables presented <a href="https://data.nasdaq.com/databases/SF1">here</a>. The primary table is <code>SHARADAR/SF1</code>. The other tables are <code>SHARADAR/DAILY</code>, <code>SHARADAR/TICKERS</code>, <code>SHARADAR/INDICATORS</code>, <code>SHARADAR/ACTIONS</code>, <code>SHARADAR/SP500</code> and <code>SHARADAR/EVENTS</code>.</p>
+<p>In each table data are presented in tabular format with indicators represented in columns.</p>
+<p>When you query data from a particular table you can specify "filters" which limit the data that is retrieved. If you do not specify a filter the entire table, all rows and columns, will be returned but limited to 10,000 rows.</p>
+<p>There are 5 filter columns in the primary <code>SHARADAR/SF1</code> table that you can use to specify which data to retrieve, these are: <code>ticker</code>, <code>calendardate</code>, <code>lastupdated</code>, <code>dimension</code>, and <code>datekey</code>.</p>
+<p>When you integrate this API you should not assume a particular column order as additional indicators will be added in the future.</p>
+<p>Data is not sorted by default and you should sort the data upon retrieval.</p>
+<p>In these examples we will assume that you have the associated Quandl package installed where necessary. In the case of the Web API no Quandl package needs to be installed. You can find installation instructions and generic documentation for each of the tools <a href="https://docs.data.nasdaq.com/">here</a>. The data retrieval methods described here are referred to under the "tables" section of Nasdaq Data Link's generic documentation, rather than the "time-series" section.</p>
+<p>We'll now demonstrate how to access the database and use the filters in the series of basic examples which follow below. These examples can also be combined to produce more complex queries.</p>
+<h3>1. Authentication</h3>
+<p>All requests must be authenticated with your API key which can be found in account settings, <a href="/account/profile">here</a>.</p>
+<p>Web API: include your API key in the URL as shown in the examples to follow</p>
+<p>Python: See our <a href="https://github.com/Nasdaq/data-link-python/#local-api-key-environment-variable">python documentation</a> for configuring your API Key.</p>
+<p>R: <code>NasdaqDataLink.api_key("4REPYvYN6PkUD57Cgy31")</code></p>
+<p>Excel: include your API key in the Quandl tab on Excel's ribbon</p>
+<h3>2. Ticker</h3>
+<p>To retrieve all data for a specified ticker:</p>
+<p>API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF1.csv?ticker=AAPL&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/SF1', ticker='AAPL')</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/SF1', ticker='AAPL')</code></p>
+<p>Excel: <code>QTABLE("SHARADAR/SF1", , "ticker", "AAPL")</code></p>
+<h3>3. Dimension</h3>
+<p>To retrieve all data for a specified <a href="/databases/SF1/documentation?anchor=dimensions">dimension</a>:</p>
+<p>Web API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF1.csv?dimension=MRY&amp;ticker=AAPL&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/SF1', dimension='MRY', ticker='AAPL')</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/SF1', dimension='MRY', ticker='AAPL')</code></p>
+<p>Excel: <code>QTABLE("SHARADAR/SF1", , "dimension", "MRY", "ticker", "AAPL")</code></p>
+<h3>4. Multiple Tickers</h3>
+<p>To retrieve data for multiple specified tickers:</p>
+<p>Web API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF1.csv?ticker=AAPL,TSLA&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/SF1', ticker=['AAPL','TSLA'])</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/SF1', ticker=c('AAPL', 'TSLA'))</code></p>
+<p>Excel: <code>QTABLE("SHARADAR/SF1", , "ticker", {"AAPL","TSLA"})</code></p>
+<h3>5. Date</h3>
+<p>To retrieve data for a specified CalendarDate:</p>
+<p>Web API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF1.csv?calendardate=2015-12-31&amp;ticker=AAPL&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/SF1', calendardate='2015-12-31', ticker='AAPL')</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/SF1', calendardate='2015-12-31', ticker='AAPL')</code></p>
+<p>Excel: <code>QTABLE("SHARADAR/SF1", , "calendardate", "2015-12-31", "ticker", "AAPL")</code></p>
+<h3>6. Operators</h3>
+<p>Data can retrieved based on greater than (gt), less than (lt), greater than or equal to (gte) or less than or equal to (lte) operators.</p>
+<p>For example, the following request retrieves all specified ticker data where the calendar date is greater than or equal to 2013-12-31:</p>
+<p>Web API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF1.csv?ticker=AAPL&amp;calendardate.gte=2013-12-31&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/SF1', calendardate={'gte':'2013-12-31'}, ticker='AAPL')</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/SF1', calendardate.gte='2013-12-31', ticker='AAPL')</code></p>
+<p>Excel: not available</p>
+<p>The operators can be applied to the filter columns: <code>calendardate</code>, <code>ticker</code>, <code>dimension</code> and <code>lastupdated</code>.</p>
+<h3>7. Indicators</h3>
+<p>To retrieve data for specified indicators (columns):</p>
+<p>Web API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF1.csv?ticker=AAPL&amp;qopts.columns=ticker,dimension,datekey,revenue&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/SF1', qopts={"columns":['ticker' ,'dimension','datekey','revenue']}, ticker='AAPL')</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/SF1', qopts.columns=c('ticker' ,'dimension','datekey','revenue'), ticker='AAPL')</code></p>
+<p>Excel: <code>QTABLE("SHARADAR/SF1", {"ticker","dimension","datekey","revenue"}, "ticker", "AAPL")</code></p>
+<h3>8. More than 10,000 Rows of Data</h3>
+<p>API calls are automatically truncated at 10,000 rows, which can be circumvented as follows:</p>
+<p>Web API (in browser: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF1?qopts.export=true&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Web API (out of browser: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF1.csv?qopts.export=true&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/SF1', calendardate={'gte':'2017-09-01','lte':'2018-01-10'}, paginate=True)</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/SF1', calendardate.gte='2017-09-01', date.lte='2018-01-10', paginate=TRUE)</code></p>
+<p>Excel: Not available</p>
+<h3>9. Recently updated data</h3>
+<p>To obtain data that has been updated since a specified date:</p>
+<p>Web API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF1.csv?lastupdated.gte=2017-11-08&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/SF1', lastupdated={'gte':'2017-11-03'}, ticker='AAPL')</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/SF1',  lastupdated.gte='2017-11-03', ticker='AAPL')</code></p>
+<p>Excel: <code>QTABLE("SHARADAR/SF1", , "lastupdated", {"2017-11-03","2020-01-01"})</code></p>
+<h3>10. Events by Ticker</h3>
+<p>To retrieve events data for a specified ticker:</p>
+<p>Web API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/EVENTS.csv?ticker=AAPL&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/EVENTS', ticker='AAPL')</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/EVENTS', ticker='AAPL')</code></p>
+<p>Excel: <code>QTABLE("SHARADAR/EVENTS", , "ticker", "AAPL")</code></p>
+<h3>11. Events by Date</h3>
+<p>To retrieve events data for a specified date:</p>
+<p>Web API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/EVENTS.csv?date=2016-04-18&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/EVENTS', date='2016-04-18')</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/EVENTS', date='2016-04-18')</code></p>
+<p>Excel: <code>QTABLE("SHARADAR/EVENTS", , "date", "2016-04-18")</code></p>
+<h3>12. Ticker Metadata</h3>
+<p>Web API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/TICKERS.csv?table=SF1&amp;ticker=AAPL&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/TICKERS', table='SF1', ticker='AAPL')</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/TICKERS', table='SF1', ticker='AAPL')</code></p>
+<p>Excel: <code>QTABLE("SHARADAR/TICKERS", , "table", "SF1", "ticker", "AAPL")</code></p>
+<h3>13. Indicator Descriptions by Table</h3>
+<p>Web API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/INDICATORS.csv?table=SF1&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/INDICATORS', table='SF1')</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/INDICATORS', table='SF1')</code></p>
+<p>Excel: <code>QTABLE("SHARADAR/TICKERS", , "table", "SF1")</code></p>
+<h3>14. Indicator Descriptions by Indicator</h3>
+<p>Web API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/INDICATORS.csv?indicator=revenue&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/INDICATORS', indicator='revenue')</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/INDICATORS', indicator='revenue')</code></p>
+<p>Excel: <code>QTABLE("SHARADAR/TICKERS", , "indicator", "revenue")</code></p>
+<h3>15. Daily Metrics by Ticker</h3>
+<p>Web API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/DAILY.csv?ticker=AAPL&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/DAILY', ticker='AAPL')</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/DAILY', ticker='AAPL')</code></p>
+<p>Excel: <code>QTABLE("SHARADAR/DAILY", , "ticker", "AAPL")</code></p>
+<h3>16. Daily Metrics by Date</h3>
+<p>Web API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/DAILY.csv?date=2018-10-29&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/DAILY', date='2018-10-29')</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/DAILY', date='2018-10-29')</code></p>
+<p>Excel: <code>QTABLE("SHARADAR/DAILY", , "date", "2018-10-29")</code></p>
+<h3>17. Corporate Actions by Ticker</h3>
+<p>Web API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/ACTIONS.csv?ticker=AAPL&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/ACTIONS', ticker='AAPL')</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/ACTIONS', ticker='AAPL')</code></p>
+<p>Excel: <code>QTABLE("SHARADAR/ACTIONS", , "ticker", "AAPL")</code></p>
+<h3>18. Corporate Actions by Date</h3>
+<p>Web API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/ACTIONS.csv?date.gte=2018-10-29&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/ACTIONS', date='2018-10-29')</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/ACTIONS', date='2018-10-29')</code></p>
+<p>Excel: <code>QTABLE("SHARADAR/ACTIONS", , "date.gte", "2018-10-29")</code></p>
+<h3>19. Corporate Actions by Type</h3>
+<p>Web API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/ACTIONS.csv?action=split&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/ACTIONS', action='split')</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/ACTIONS', action='split')</code></p>
+<p>Excel: <code>QTABLE("SHARADAR/ACTIONS", , "action", "split")</code></p>
+<h3>20. Current S&amp;P500 Constituents</h3>
+<p>Web API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SP500.csv?action=current&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/SP500', action='current')</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/SP500', action='current')</code></p>
+<p>Excel: <code>QTABLE("SHARADAR/SP500", , "action", "current")</code></p>
+<h3>21. Changes to S&amp;P500 Constituents</h3>
+<p>Web API: <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SP500.csv?action=added,removed&amp;date.gte=2018-01-01&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>Python: <code>nasdaqdatalink.get_table('SHARADAR/SP500', action=['added','removed'], date={'gte':'2018-01-01'})</code></p>
+<p>R: <code>NasdaqDataLink.datatable('SHARADAR/SP500', action=c('added','removed'), date.gte='2018-01-01')</code></p>
+<p>Excel: <code>QTABLE("SHARADAR/SP500", , "action", {"added","removed"}, "date.gte", "2018-01-01")</code></p>
+<h3>22. Other data formats</h3>
+<p>JSON:</p>
+<p>Web API (only): <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF1.json?ticker=AAPL&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>XML:</p>
+<p>Web API (only): <code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF1.xml?ticker=AAPL&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p></div></section></div><div id="anchor-coverage" data-anchor="anchor-coverage" class="product-documentation__anchor"><h1>Coverage</h1><div class="documentation-parent-content"></div><section data-anchor="anchor-tickers" id="anchor-tickers" class="product-documentation__anchor"><h2>Tickers</h2><div class="documentation-markdown"><p>This data feed currently covers 14,000+ US companies. The complete list of tickers included in this feed, along with other information such as company name, exchange, listing status, industry, location, etc can be found using the following API call:</p>
+<p><a href="https://data.nasdaq.com/api/v3/datatables/SHARADAR/TICKERS?table=SF1&amp;api_key=4REPYvYN6PkUD57Cgy31&amp;qopts.export=true"><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/TICKERS?table=SF1&amp;api_key=4REPYvYN6PkUD57Cgy31&amp;qopts.export=true</code></a></p>
+<p>For more information on how to query this table programmatically, please refer to the <a href="https://docs.data.nasdaq.com/docs/in-depth-usage-1">Tables API docs</a>.</p></div></section><section data-anchor="anchor-indicators" id="anchor-indicators" class="product-documentation__anchor"><h2>Indicators</h2><div class="documentation-markdown"><p>This data feed currently covers 150 indicators. The complete list of indicators included in this feed, along with other information such as name, description and units can be found using the following API call:</p>
+<p><a href="https://data.nasdaq.com/api/v3/datatables/SHARADAR/INDICATORS?table=SF1,TICKERS,DAILY,SP500,ACTIONS,EVENTS&amp;api_key=4REPYvYN6PkUD57Cgy31&amp;qopts.export=true"><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/INDICATORS?table=SF1,TICKERS,DAILY,SP500,ACTIONS,EVENTS&amp;api_key=4REPYvYN6PkUD57Cgy31&amp;qopts.export=true</code></a></p>
+<p>For more information on how to query this table programmatically, please refer to the <a href="https://docs.data.nasdaq.com/docs/in-depth-usage-1">Tables API docs</a>.</p></div></section></div><div id="anchor-sample-data" data-anchor="anchor-sample-data" class="product-documentation__anchor"><h1>Sample Data</h1><div class="documentation-parent-content"><p>Free sample data is provided to all Nasdaq Data Link users. The sample includes all most-recently reported annual data (<code>dimension = MRY</code>) for the following tickers for calendar date starting from 2012-01-01 to 2018-12-31.</p>
+<table><thead><tr><th>Ticker</th><th>Company Name</th></tr></thead><tbody><tr><td>AAPL</td><td>APPLE INC</td></tr><tr><td>AXP</td><td>AMER EXPRESS CO</td></tr><tr><td>BA</td><td>BOEING CO</td></tr><tr><td>CAT</td><td>CATERPILLAR INC</td></tr><tr><td>CSCO</td><td>CISCO SYSTEMS</td></tr><tr><td>CVX</td><td>CHEVRON CORP</td></tr><tr><td>DD</td><td>DU PONT (EI) DE</td></tr><tr><td>DIS</td><td>DISNEY WALT</td></tr><tr><td>GE</td><td>GENL ELECTRIC</td></tr><tr><td>GS</td><td>GOLDMAN SACHS</td></tr><tr><td>HD</td><td>HOME DEPOT</td></tr><tr><td>IBM</td><td>INTL BUS MACH</td></tr><tr><td>INTC</td><td>INTEL CORP</td></tr><tr><td>JNJ</td><td>JOHNSON &amp; JOHNS</td></tr><tr><td>JPM</td><td>JPMORGAN CHASE</td></tr><tr><td>KO</td><td>COCA COLA CO</td></tr><tr><td>MCD</td><td>MCDONALDS CORP</td></tr><tr><td>MMM</td><td>3M CO</td></tr><tr><td>MRK</td><td>MERCK &amp; CO INC</td></tr><tr><td>MSFT</td><td>MICROSOFT CORP</td></tr><tr><td>NKE</td><td>NIKE INC-B</td></tr><tr><td>PFE</td><td>PFIZER INC</td></tr><tr><td>PG</td><td>PROCTER &amp; GAMBL</td></tr><tr><td>TRV</td><td>TRAVELERS COS</td></tr><tr><td>UNH</td><td>UNITEDHEALTH GP</td></tr><tr><td>UTX</td><td>UTD TECHS CORP</td></tr><tr><td>V</td><td>VISA INC-A</td></tr><tr><td>VZ</td><td>VERIZON COMM</td></tr><tr><td>WMT</td><td>WALMART INC</td></tr><tr><td>XOM</td><td>EXXON MOBIL CRP</td></tr></tbody></table>
+<p>See the <a href="/databases/SF1/documentation?anchor=getting-started">Getting Started</a> for usable examples.</p></div></div><div id="anchor-dimensions" data-anchor="anchor-dimensions" class="product-documentation__anchor"><h1>Dimensions</h1><div class="documentation-parent-content"><p>There are several different ways to look at company financials over time. We cater for this by offering multiple <code>dimensions</code> to the database.</p>
+<p>The two primary dimensions to the database are the <code>As Reported (AR)</code> and <code>Most-Recent Reported (MR)</code> dimensions:</p>
+<p>As Reported view (AR):</p>
+<ul>
+<li>excludes restatements</li>
+<li>point-in-time view with data time-indexed to the date the form 10 regulatory filing was submitted to the SEC</li>
+<li>presents data for the latest reporting period at that filing date</li>
+<li>may include multiple observations in a quarter if more than one filing is made during the quarter</li>
+<li>on limited occassion may not have any observations in a particular quarter. Sometimes companies are delayed in reporting for up to 18 months. On such occassions they may report multiple documents on the same date to catch up, in which case these datasets will only provide date for the most recent reporting period.</li>
+<li>typically suitable for back-testing</li>
+</ul>
+<p>Most-Recent Reported view (MR):</p>
+<ul>
+<li>includes restatements</li>
+<li>time indexed to the financial/report period</li>
+<li>presents the most recently reported data for that reporting period</li>
+<li>typically suitable for assessing business performance after restatements for mergers/divestitures</li>
+</ul>
+<p>In addition there are 3 time dimensions:</p>
+<ul>
+<li>Annual (Y): Annual observations of one year duration</li>
+<li>Trailing Twelve Months (T): Quarterly observations of one year duration</li>
+<li>Quarterly (Q): Quarterly observations of quarterly duration (available only for US domestic companies, unavailable for foreign companies)</li>
+</ul>
+<table><thead><tr><th>Dimensions</th><th>As Reported</th><th>Most-Recent Reported</th></tr></thead><tbody><tr><td>Annual</td><td>ARY</td><td>MRY</td></tr><tr><td>Quarterly</td><td>ARQ</td><td>MRQ</td></tr><tr><td>Trailing Twelve Months</td><td>ART</td><td>MRT</td></tr></tbody></table></div></div><div id="anchor-methodology" data-anchor="anchor-methodology" class="product-documentation__anchor"><h1>Methodology</h1><div class="documentation-parent-content"></div><section data-anchor="anchor-handling-restatements" id="anchor-handling-restatements" class="product-documentation__anchor"><h2>Handling Restatements</h2><div class="documentation-markdown"><p>We can review the methodology applied in calculating restated financials by way of example. In recent years Abbott Laboratories (ticker ABT) restated its prior year financials. The impact to revenue is depicted here and is identifiable by the vertical distance between AR and MR <a href="/databases/SF1/documentation?anchor=dimensions">dimensions</a>:
+<img src="http://www.sharadar.com/meta/img4.png" alt=""></p>
+<p>The other important observation to make is that the restatement has resulted in one quarter of negative revenue for the MRQ dimension at the end of 2011. This is because while Abbott has provided restated annual financials for this year, it has not provided restated quarterlies for the year. Therefore the negative quarter has been calculated by Sharadar by utilising the most recently reported information. This is in order to ensure that the quarterly and annual financials are aligned. For clarity we can reperform this calculation by referring to the underlying data as follows:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Description</th><th>Value</th></tr></thead><tbody><tr><td>MRY 2011-12-31</td><td>$21.4bn</td></tr><tr><td>less MRQ 30/09/2011</td><td>($9.8bn)</td></tr><tr><td>less MRQ 30/06/2011</td><td>($9.6bn)</td></tr><tr><td>less MRQ 31/03/2011</td><td>($9.0bn)</td></tr><tr><td>equals MRQ 2011-12-31</td><td>($7.1bn)</td></tr></tbody></table>
+<p>This effectively assigns the impact of the full year's restatement to a single quarter. Argubly it would be more representative that it was spread amongst the other quarters of the year, however this calculation would be arbitrary unless performed and reported by the company itself. Should the company report this information at a future point this database will be updated accordingly.</p>
+<p>As a corollary it should be noted that datapoints under the ART dimension (As Reported, Trailing Twelve Months), do not necessarily reflect the sum of the prior four ARQ (As Reported, Quarterly) datapoints.
+As a reminder, the As Reported dimension presents data for the latest reporting period at that filing date. Therefore, if an earlier reporting period is restated it will not be reported as a quarterly ARQ datapoint since it is does not cover the latest reporting period. However, this restated quarter will still be considered in the calculation of a corresponding Trailing Twelve Month datapoint if the restatement occurs within that twelve month timeframe.</p></div></section><section data-anchor="anchor-time-indexing" id="anchor-time-indexing" class="product-documentation__anchor"><h2>Time-Indexing</h2><div class="documentation-markdown"><p>As previously noted, the As-Reported <a href="/databases/SF1/documentation?anchor=dimensions">dimensions</a> present a <code>point-in-time</code> view with data time-indexed to the date of the form 10 regulatory filing to the SEC. This is in order to more closely align with the date that information was disseminated to the market, and the corresponding market impact. This is is a more accurate measure than the reporting period which the Most-Recent Reported <a href="/databases/SF1/documentation?anchor=dimensions">dimensions</a> utilize, which are typically months before the information reaches the market, and subject to restatement. However, it must be noted that the information contained in the form 10 may have been separately disclosed to the market days (or on rare occassion - weeks) earlier under separate form 8 regulatory filing. It is safe to assume that the information would have been available the day after the As-Reported date (at the latest). In addition, you can identify the date of the form 8 filing by referring to the <code>EVENT</code> indicator. We source our data from a company's form 10 filing rather than their form 8 filing since the form 8 filings do not consistently contain full consolidated financial statements.</p></div></section><section data-anchor="anchor-negative-p-e-ratios" id="anchor-negative-p-e-ratios" class="product-documentation__anchor"><h2>Negative P/E Ratios</h2><div class="documentation-markdown"><p>Where a company reports negative earnings it's calculated <code>PE</code> (or <code>PE1</code>) ratio will be negative - please be aware of this when filtering for low P/E ratios.</p></div></section></div><div id="anchor-batch-download" data-anchor="anchor-batch-download" class="product-documentation__anchor"><h1>Batch Download</h1><div class="documentation-parent-content"><p>Subscribers can download the entire table in browser at anytime as follows:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF1?qopts.export=true&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>In addition you can change the table to be downloaded (for exmple to <code>SHARADAR/DAILY</code>) and add other arguments to filter the data that is retrieved through this batch process, as described in the <a href="/databases/SF1/documentation?anchor=getting-started">Getting Started</a> section of the docs.</p>
+<p>For a machine-readable representation of this route add ".csv" or ".json" to the url as follows:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF1.json?qopts.export=true&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>You can find sample Python code for automated retrieval via the batch download function <a href="http://www.sharadar.com/meta/bulk_fetch.py">here</a>.</p></div></div><div id="anchor-exception-handling" data-anchor="anchor-exception-handling" class="product-documentation__anchor"><h1>Exception Handling</h1><div class="documentation-parent-content"><ul>
+<li>
+<p><code>SHARESWADIL</code> and <code>EPSDIL</code> are not consistently reported by all companies, and there is a higher incidence of non-availability of both these indicators, and the <code>DILUTIONRATIO</code> indicator which is subsequently derived.</p>
+</li>
+<li>
+<p>Ratios which have zero in the denominator cannot be calculated and will be blank. For example, where a company's trailing twelve month <code>EPS</code> sums to 0.0 the subsequently derived <code>PE1</code> indicator cannot be calculated. This also applies to <code>ROS</code>, <code>NETMARGIN</code>, <code>PS</code>, <code>PS1</code>, <code>GROSSMARGIN</code>  and <code>EBITDAMARGIN</code> for companies that have zero <code>REVENUE</code>. Companies that have zero revenue are generally, but not exclusively, early stage Biotech firms.</p>
+</li>
+<li>
+<p>Not all companies operate a classified Balance Sheet - approximately 20% of the companies in the database do not, most of which are financial firms. As such: <code>ASSETSC</code> (Current Assets) &amp; <code>LIABILITIESC</code> (Current Liabilities), and the subsequently derived <code>ASSETSNC</code>, <code>LIABILITIESNC</code>, <code>CURRENTRATIO</code> and <code>WORKINGCAPITAL</code>, are not reported for all companies. In addition, companies can change their financial statement presentation and start or stop operating a classified Balance Sheet, therefore there may be gaps in the availability of these indicators.</p>
+</li>
+<li>
+<p>Newly listed companies may not have the four quarters of reporting history required to calculate the trailing twelve month dimension, therefore the dataset may be blank until this history is available.</p>
+</li>
+<li>
+<p>On limited occassion Annual and Quarterly financial statement presentation does not conform. For example, sometimes companies only report <code>DEPAMOR</code>, <code>INTEXP</code> and/or <code>TAXEXP</code> annually and not quarterly. In these instances the quarterly values will not sum to the annual values.</p>
+</li>
+</ul>
+<p>As always, we welcome your further <a href="mailto:vincent@sharadar.com?subject=Known%20Issues">comments</a>.</p></div></div><div id="anchor-faqs" data-anchor="anchor-faqs" class="product-documentation__anchor"><h1>FAQs</h1><div class="documentation-parent-content"></div><section data-anchor="anchor-frequently-asked-questions" id="anchor-frequently-asked-questions" class="product-documentation__anchor"><h2>Frequently Asked Questions</h2><div class="documentation-markdown"><h3>How soon after a company reports will the database be updated?</h3>
+<p>The database is updated within 24 hours of the form 10 SEC filing, often within 12 hours. Note that companies may report abbreviated financial statements via a separate form 8 SEC filing days or on occassion weeks before the form 10 filing. We do not source our data from the form 8 filing since it does not reliably contain full consolidated financial statements (income statement, balance sheet &amp; cash flow statement).</p>
+<h3>Can "this" ticker or "that" indicator be added to the database?</h3>
+<p>If there's something that you want to see in the database, then please drop us an [email](mailto:<a href="mailto:vincent@sharadar.com">vincent@sharadar.com</a>?subject=Can "this" be added to the database?).</p>
+<h3>How are "N/A" values (non-reported items) treated?</h3>
+<p>Great question - the answer depends on the indicator. For example, if a company has no <code>DEBT</code> on it's balance sheet then this means the value is zero. If a company doesn't report <code>ASSETSC</code> (Current Assets) on it's balance sheet - this does not mean that the value is zero. In this instance the appropriate value is <code>"N/A"</code>, however, <code>"N/A"</code> is not presently supported on the platform and therefore nothing is reported on this date.</p></div></section></div><div id="anchor-api-libraries" data-anchor="anchor-api-libraries" class="product-documentation__anchor"><h1>API/Libraries</h1><div class="documentation-parent-content"></div><section data-anchor="anchor-overview" id="anchor-overview" class="product-documentation__anchor"><h2>Overview</h2><div class="documentation-markdown"><p>The full Sharadar Fundamentals database is accessible via the Nasdaq Data Link API.  The database is also available via Nasdaq Data Link's free libraries for <a href="/help/r">R</a>, <a href="/help/python">Python</a>, <a href="/help/matlab">Matlab</a>, <a href="/help/excel">Excel</a> and <a href="/help/libraries">other tools</a>.</p>
+<p>For complete API documentation, see <a href="https://docs.data.nasdaq.com/docs/tables-1">Nasdaq Data Link Tables API Documentation</a></p></div></section><section data-anchor="anchor-api-and-library-helpers" id="anchor-api-and-library-helpers" class="product-documentation__anchor"><h2>API and Library Helpers</h2><div class="documentation-markdown"><p>To quickly generate API calls or library calls, you can visit the <a href="https://data.nasdaq.com/databases/SF1/usage/quickstart/api">usage tab</a>.</p></div></section><section data-anchor="anchor-see-also" id="anchor-see-also" class="product-documentation__anchor"><h2>See Also</h2><div class="documentation-markdown"><p>For more information:</p>
+<ul>
+<li><a href="https://docs.data.nasdaq.com/docs/in-depth-usage-1">General Nasdaq Data Link API Documentation</a></li>
+<li><a href="/help/libraries">Nasdaq Data Link Libraries</a></li>
+</ul></div></section></div><div id="anchor-support" data-anchor="anchor-support" class="product-documentation__anchor"><h1>Support</h1><div class="documentation-parent-content"></div><section data-anchor="anchor-email" id="anchor-email" class="product-documentation__anchor"><h2>Email</h2><div class="documentation-markdown"><p>Premium support is available for subscribers to this database:</p>
+<ul>
+<li>
+<p>Database-specific: <a href="mailto:vincent@sharadar.com">vincent@sharadar.com</a></p>
+</li>
+<li>
+<p>Nasdaq Data Link platform/tools: <a href="mailto:clientsuccess@nasdaq.com">clientsuccess@nasdaq.com</a></p>
+</li>
+</ul></div></section></div><div id="usage" data-anchor="usage" class="product-documentation__anchor"><div id="quick-start-examples" data-anchor="quick-start-examples"><h1>API Usage</h1><nav class="usage-examples-navigation"><div class="nav-option nav-option-selected"><span class="usage-nav-text">API</span><img alt="API" class="usage-nav-icon" src="https://next-pro.cdn.data.nasdaq.com/assets/images/product/usage/api-black.svg"></div><div class="nav-option "><span class="usage-nav-text">Python</span><img alt="Python" class="usage-nav-icon" src="https://next-pro.cdn.data.nasdaq.com/assets/images/product/usage/python-grey.svg"></div><div class="nav-option "><span class="usage-nav-text">R</span><img alt="R" class="usage-nav-icon" src="https://next-pro.cdn.data.nasdaq.com/assets/images/product/usage/r-grey.svg"></div><div class="nav-option "><span class="usage-nav-text">Excel</span><img alt="Excel" class="usage-nav-icon" src="https://next-pro.cdn.data.nasdaq.com/assets/images/product/usage/excel-grey.svg"></div></nav><div class="usage-container"><h4 class="usage-heading">Getting started with the API</h4><div class="usage-subscribe-free-sample-container"><div class="usage-subscribe-free-sample-div"><h5>Free sample enabled</h5><p>A subset of this data is available for testing without a subscription. To view the full data, you must subscribe to the product.</p><a class="guest-pricing-pri-button">Subscribe</a></div></div><div class="usage-section__examples-text"><h2>Usage Examples</h2><p>You can try any of these API calls by pasting them into your browser window. Users with programming experience can use wget or curl to run these calls from the command line.</p><p>The usage examples below pull sample columns from the available data. To view a list of all filterable columns and their descriptions, visit the data product documentation tab.</p></div><div class="usage-code__section"><h2>Filter by a single date and ticker</h2><div class="usage-section__example">https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF1?calendardate=2023-12-31&amp;ticker=ZYXI&amp;api_key=<span style="color: rgb(0, 191, 63);">4REPYvYN6PkUD57Cgy31</span></div><h2>Filter by a single date and multiple ticker</h2><div class="usage-section__example">https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF1?ticker=ZYXI&amp;calendardate=2023-12-31%2C2022-12-31%2C2021-12-31&amp;api_key=<span style="color: rgb(0, 191, 63);">4REPYvYN6PkUD57Cgy31</span></div></div><div class="usage-documentation-container"><h4>Full API Reference</h4><p>For an in-depth look at how to use Nasdaq Data Link’s API, please consult our full documentation.</p><a href="https://docs.data.nasdaq.com/docs/tables-1" class="guest-pricing-pri-button">View the docs</a></div></div></div><div id="data-export" data-anchor="data-export"><h1>Data Export</h1><div class="data-export-section__unsub-container"><p>Full data only available to subscribers</p><a class="guest-pricing-pri-button">Subscribe</a></div><h2>Only Available for Subscribers</h2><p>This section can be used to download an entire table once subscribed. The output format is always the same: a single zipped CSV file of the entire table.</p></div></div></div>

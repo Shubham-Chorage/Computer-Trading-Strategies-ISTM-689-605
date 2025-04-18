@@ -1,0 +1,79 @@
+<div id="documentation" class="product-documentation__doc-text"><div id="anchor-about" data-anchor="anchor-about" class="product-documentation__anchor"><h1>About</h1><div class="documentation-parent-content"></div><section data-anchor="anchor-database" id="anchor-database" class="product-documentation__anchor"><h2>Database</h2><div class="documentation-markdown"><p>This database provides insider holdings and transactions through a simple and easy to access interface.</p>
+<p>Coverage:</p>
+<ul>
+<li>More than 15,000 issuers, and 200,000 insiders</li>
+<li>More than 12 years of history</li>
+</ul>
+<p>Data is sourced from SEC form 3, 4 &amp; 5 filings.</p>
+<p>See the examples and <a href="/data/SF2/documentation?anchor=getting-started">get started</a> now.</p></div></section><section data-anchor="anchor-publisher" id="anchor-publisher" class="product-documentation__anchor"><h2>Publisher</h2><div class="documentation-markdown"><p>Sharadar is an independent research and analytics firm founded in 2013.  Sharadar specializes in extraction, standardization and organization of financial data from company filings.  We combine people, software and rigorous review processes to generate accurate, professional grade data for professional investors and analysts.</p></div></section></div><div id="anchor-getting-started" data-anchor="anchor-getting-started" class="product-documentation__anchor"><h1>Getting Started</h1><div class="documentation-parent-content"></div><section data-anchor="anchor-getting-started" id="anchor-getting-started" class="product-documentation__anchor"><h2>Getting Started</h2><div class="documentation-markdown"><p>We'll demonstrate how to access the database, using filters to specify which data to retrieve. We'll start off with a compund example that uses multiple filters, then a series of simple examples that you can combine to your requirements in order to produce more complex queries.</p>
+<h3>1. Compound Example</h3>
+<p>The following request will retrieve the non-derivative holdings and transactions of Tim Cook in AAPL and NKE for the filing dates between 2014-12-31 and 2016-12-31 (inclusive) where the transaction value is greater than $100,000:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF2.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;securityadcode=N,NA,ND&amp;ownername=COOK TIMOTHY D&amp;ticker=AAPL,NKE&amp;filingdate.gte=2014-12-31&amp;filingdate.lte=2016-12-31&amp;transactionvalue.gte=100000</code></p>
+<h3>2. Authentication</h3>
+<p>All requests to the new API must be authenticated with your API key which can be found in account settings, <a href="/account/profile">here</a>.</p>
+<h3>3. Ticker</h3>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF2.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;ticker=AAPL</code></p>
+<h3>4. Data Format</h3>
+<p>csv:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF2.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;ticker=AAPL</code></p>
+<p>json:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF2.json?api_key=4REPYvYN6PkUD57Cgy31&amp;ticker=AAPL</code></p>
+<p>xml:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF2.xml?api_key=4REPYvYN6PkUD57Cgy31&amp;ticker=AAPL</code></p>
+<h3>5. Owner Name</h3>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF2.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;ownername=COOK TIMOTHY D</code></p>
+<h3>6. Date (and Ticker)</h3>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF2.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;ticker=AAPL&amp;filingdate=2015-12-31</code></p>
+<h3>7. Derivative and Non-Derivative Holdings and Transactions (and Owner)</h3>
+<p>Derivative Holdings:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF2.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;ownername=COOK TIMOTHY D&amp;securityadcode=D,DA,DD</code></p>
+<p>Non-Derivative Holdings:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF2.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;ownername=COOK TIMOTHY D&amp;securityadcode=N,NA,ND</code></p>
+<h3>8. Operators</h3>
+<p>Data can retrieved based on greater than (gt), less than (lt), greater than or equal to (gte) or less than or equal to (lte) operators.</p>
+<p>For example, the following request retrieves all specified ticker data where the filing date is greater than or equal to 2014-12-31:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF2.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;ticker=AAPL&amp;filingdate.gte=2014-12-31</code></p>
+<p>The operators can be applied to the filter columns: <code>ticker</code>, <code>filingdate</code>, <code>ownername</code>, <code>transactionvalue</code>, and <code>securityadcode</code>.</p>
+<h3>9. Transactions above or below a specified threshold</h3>
+<p>Above a $100m threshold:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF2.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;transactionvalue.gte=100000000</code></p>
+<p>Below a -$100m threshold:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF2.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;transactionvalue.lte=-100000000</code></p>
+<h3>10. Indicators (and Ticker)</h3>
+<p>You can limit the indicators (columns) retrieved. The following example will return the names of TSLA insiders, the dates of their SEC insider filing, their officer title (if applicable), and whether or not they are an officer, and/or a director:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF2.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;ticker=TSLA&amp;qopts.columns=ownername,filingdate,officertitle,isofficer,isdirector</code></p>
+<h3>11. Most Recent N Observations</h3>
+<p>Data is stored sorted in descending order by date of filing with the SEC. Therefore to retrieve the most recent N items filed with the sec you can utilize the <code>qopts.per_page</code> parameter. In this example we will retrieve the most recent 100 items:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF2.csv?api_key=4REPYvYN6PkUD57Cgy31&amp;qopts.per_page=100</code></p>
+<p>If unspecified the default number of rows per call is 10,000.</p></div></section></div><div id="anchor-sample-data" data-anchor="anchor-sample-data" class="product-documentation__anchor"><h1>Sample Data</h1><div class="documentation-parent-content"><p>Free sample data is provided to all Nasdaq Data Link users, for the following stock tickers with filing date between 2019-09-01 and 2019-12-31.</p>
+<table><thead><tr><th>Ticker</th><th>Company Name</th></tr></thead><tbody><tr><td>AAPL</td><td>APPLE INC</td></tr><tr><td>AXP</td><td>AMER EXPRESS CO</td></tr><tr><td>BA</td><td>BOEING CO</td></tr><tr><td>CAT</td><td>CATERPILLAR INC</td></tr><tr><td>CSCO</td><td>CISCO SYSTEMS</td></tr><tr><td>CVX</td><td>CHEVRON CORP</td></tr><tr><td>DD</td><td>DU PONT (EI) DE</td></tr><tr><td>DIS</td><td>DISNEY WALT</td></tr><tr><td>GE</td><td>GENL ELECTRIC</td></tr><tr><td>GS</td><td>GOLDMAN SACHS</td></tr><tr><td>HD</td><td>HOME DEPOT</td></tr><tr><td>IBM</td><td>INTL BUS MACH</td></tr><tr><td>INTC</td><td>INTEL CORP</td></tr><tr><td>JNJ</td><td>JOHNSON &amp; JOHNS</td></tr><tr><td>JPM</td><td>JPMORGAN CHASE</td></tr><tr><td>KO</td><td>COCA COLA CO</td></tr><tr><td>MCD</td><td>MCDONALDS CORP</td></tr><tr><td>MMM</td><td>3M CO</td></tr><tr><td>MRK</td><td>MERCK &amp; CO INC</td></tr><tr><td>MSFT</td><td>MICROSOFT CORP</td></tr><tr><td>NKE</td><td>NIKE INC-B</td></tr><tr><td>PFE</td><td>PFIZER INC</td></tr><tr><td>PG</td><td>PROCTER &amp; GAMBL</td></tr><tr><td>TRV</td><td>TRAVELERS COS</td></tr><tr><td>UNH</td><td>UNITEDHEALTH GP</td></tr><tr><td>UTX</td><td>UTD TECHS CORP</td></tr><tr><td>V</td><td>VISA INC-A</td></tr><tr><td>VZ</td><td>VERIZON COMM</td></tr><tr><td>WMT</td><td>WALMART INC</td></tr><tr><td>XOM</td><td>EXXON MOBIL CRP</td></tr></tbody></table>
+<p>See the <a href="/data/SF2/documentation?anchor=getting-started">Getting Started</a> for usable examples.</p></div></div><div id="anchor-batch-download" data-anchor="anchor-batch-download" class="product-documentation__anchor"><h1>Batch Download</h1><div class="documentation-parent-content"><p>Subscribers can download the entire database at anytime. First, access the following url:</p>
+<p><code>https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF2.csv?qopts.export=true&amp;api_key=4REPYvYN6PkUD57Cgy31</code></p>
+<p>This will return csv text that includes a file status code. If the status code is "creating", "generating" or "regenerating" then wait a minute or two and try again. When the status code is "fresh" then use the url that is also returned in the csv text in order to retrieve the bulk download.</p>
+<p>In addition you can add other arguments to filter the data that is retrieved through this batch process, as described in the <a href="/data/SF2/documentation?anchor=getting-started">docs</a>.</p></div></div><div id="anchor-notes-and-issues" data-anchor="anchor-notes-and-issues" class="product-documentation__anchor"><h1>Notes and Issues</h1><div class="documentation-parent-content"><ul>
+<li>
+<p>data is sourced from SEC form 3, 4 and 5.</p>
+</li>
+<li>
+<p>The <code>SharesOwnedBeforeTransaction</code> and <code>SharesOwnedFollowingTransaction</code> are as reported in the underlying SEC filings. There is some complexity to them which it is necessary to bear in mind. At a minimum these fields represent separate sub-totals for each of derivative and non-derivative holdings, identifiable through the <code>SecurityADCode</code> field. Some filers segement this further to represent subtotals for <code>DirectOrIndirect</code> holdings and / or <code>SecurityTitle</code>.</p>
+</li>
+<li>
+<p>data is currently not adjusted for stock splits.</p>
+</li>
+<li>
+<p>where a filing has been subsequently restated the FormType field of the restated filing will be prepended with "RESTATED".</p>
+</li>
+</ul></div></div><div id="anchor-api-libraries" data-anchor="anchor-api-libraries" class="product-documentation__anchor"><h1>API/Libraries</h1><div class="documentation-parent-content"></div><section data-anchor="anchor-overview" id="anchor-overview" class="product-documentation__anchor"><h2>Overview</h2><div class="documentation-markdown"><p>The full Sharadar Fundamentals database is accessible via the Nasdaq Data Link API.  The database is also available via Nasdaq Data Link's free libraries for <a href="/help/r">R</a>, <a href="/help/python">Python</a>, <a href="/help/matlab">Matlab</a>, <a href="/help/excel">Excel</a> and <a href="/help/libraries">other tools</a>.</p>
+<p>For complete API documentation, see <a href="/help/api">docs.data.nasdaq.com</a></p></div></section><section data-anchor="anchor-see-also" id="anchor-see-also" class="product-documentation__anchor"><h2>See Also</h2><div class="documentation-markdown"><p>For more information:</p>
+<ul>
+<li><a href="/help/api">General Nasdaq Data Link API Documentation</a></li>
+<li><a href="/help/libraries">Nasdaq Data Link Libraries</a></li>
+</ul></div></section></div><div id="anchor-support" data-anchor="anchor-support" class="product-documentation__anchor"><h1>Support</h1><div class="documentation-parent-content"></div><section data-anchor="anchor-email" id="anchor-email" class="product-documentation__anchor"><h2>Email</h2><div class="documentation-markdown"><p>Premium support is available for subscribers to this database:</p>
+<ul>
+<li>
+<p>Database-specific: <a href="mailto:vincent@sharadar.com">vincent@sharadar.com</a></p>
+</li>
+<li>
+<p>Nasdaq Data Link platform/tools: <a href="mailto:clientsuccess@nasdaq.com">clientsuccess@nasdaq.com</a></p>
+</li>
+</ul></div></section></div><div id="usage" data-anchor="usage" class="product-documentation__anchor"><div id="quick-start-examples" data-anchor="quick-start-examples"><h1>API Usage</h1><nav class="usage-examples-navigation"><div class="nav-option nav-option-selected"><span class="usage-nav-text">API</span><img alt="API" class="usage-nav-icon" src="https://next-pro.cdn.data.nasdaq.com/assets/images/product/usage/api-black.svg"></div><div class="nav-option "><span class="usage-nav-text">Python</span><img alt="Python" class="usage-nav-icon" src="https://next-pro.cdn.data.nasdaq.com/assets/images/product/usage/python-grey.svg"></div><div class="nav-option "><span class="usage-nav-text">R</span><img alt="R" class="usage-nav-icon" src="https://next-pro.cdn.data.nasdaq.com/assets/images/product/usage/r-grey.svg"></div><div class="nav-option "><span class="usage-nav-text">Excel</span><img alt="Excel" class="usage-nav-icon" src="https://next-pro.cdn.data.nasdaq.com/assets/images/product/usage/excel-grey.svg"></div></nav><div class="usage-container"><h4 class="usage-heading">Getting started with the API</h4><div class="usage-subscribe-free-sample-container"><div class="usage-subscribe-free-sample-div"><h5>Free sample enabled</h5><p>A subset of this data is available for testing without a subscription. To view the full data, you must subscribe to the product.</p><a class="guest-pricing-pri-button">Subscribe</a></div></div><div class="usage-section__examples-text"><h2>Usage Examples</h2><p>You can try any of these API calls by pasting them into your browser window. Users with programming experience can use wget or curl to run these calls from the command line.</p><p>The usage examples below pull sample columns from the available data. To view a list of all filterable columns and their descriptions, visit the data product documentation tab.</p></div><div class="usage-code__section"><h2>Filter by a single date and ticker</h2><div class="usage-section__example">https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF2?filingdate=2009-08-05&amp;ticker=ZZ&amp;api_key=<span style="color: rgb(0, 191, 63);">4REPYvYN6PkUD57Cgy31</span></div><h2>Filter by a single date and multiple ticker</h2><div class="usage-section__example">https://data.nasdaq.com/api/v3/datatables/SHARADAR/SF2?ticker=ZZ&amp;filingdate=2009-08-05%2C2009-07-14%2C2009-06-16&amp;api_key=<span style="color: rgb(0, 191, 63);">4REPYvYN6PkUD57Cgy31</span></div></div><div class="usage-documentation-container"><h4>Full API Reference</h4><p>For an in-depth look at how to use Nasdaq Data Link’s API, please consult our full documentation.</p><a href="https://docs.data.nasdaq.com/docs/tables-1" class="guest-pricing-pri-button">View the docs</a></div></div></div><div id="data-export" data-anchor="data-export"><h1>Data Export</h1><div class="data-export-section__unsub-container"><p>Full data only available to subscribers</p><a class="guest-pricing-pri-button">Subscribe</a></div><h2>Only Available for Subscribers</h2><p>This section can be used to download an entire table once subscribed. The output format is always the same: a single zipped CSV file of the entire table.</p></div></div></div>
