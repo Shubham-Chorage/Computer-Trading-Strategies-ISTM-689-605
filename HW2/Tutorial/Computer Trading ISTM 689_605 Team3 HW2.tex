@@ -1,0 +1,332 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage{fullpage}
+\renewcommand{\baselinestretch}{1.25} 
+\usepackage[top=1cm, bottom=3.5cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{minted}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage[T1]{fontenc}
+
+\definecolor{light}{rgb}{0.95, 0.95, 0.95}
+\setminted{linenos}
+\setminted{bgcolor=light}
+
+\title{HW-2 Tutorial: Creating a Stock Universe Database}
+\date{February 17, 2025}
+
+\begin{document}
+
+\maketitle
+
+\section{Learning Outcomes}
+
+After completing the tutorial, students should be able to:
+\begin{itemize}
+    \item Use R's \texttt{tidyverse}, \texttt{furrr}, and \texttt{NasdaqDataLink} packages to load, manipulate, and process financial data.
+    \item Retrieve historical stock and market data in parallel while implementing robust error handling using \texttt{tryCatch}.
+    \item Filter and validate the dataset by aligning stock data with the exact periods when companies were part of the S\&P 500.
+    \item Summarize raw insider trading data into meaningful daily indicators---such as the number of shares bought/sold and the count of unique insiders trading.
+    \item Integrate supplementary market information (like market cap, P/E, and P/S ratios) to enhance the dataset for deeper analysis.
+\end{itemize}
+
+\section{Introduction}
+This tutorial will guide you through the process of creating a historical
+database of stock data, specifically for the S\&P 500 stocks, covering the last
+10 years. The tutorial also includes adding financial sector information and
+summarizing insider trading data. The stock universe is constructed using data
+from the Sharadar Equities Prices dataset and supplemented with the Sharadar Core US Fundamentals Data dataset.
+
+\section{Data Collection}
+The first part of the task involves collecting stock data for the S\&P 500.
+Adjusted open, high, low, close, and volume columns for each stock, covering
+the last 10 years are included from the data table.
+
+\subsection{Loading the Stock Symbols}
+The stock symbols are provided in a CSV file, ``SP Tickers.csv,'' which contains
+the ticker symbols for all the companies in the S\&P 500. The first step is to
+load these symbols into R.
+
+\begin{minted}{r}
+# Load necessary libraries
+library(tidyverse)
+library(furrr)
+library(NasdaqDataLink)
+
+# Set API key for Nasdaq Data Link
+NasdaqDataLink.api_key("your-API-key")
+
+# Read stock symbols from CSV file
+symbols <- read_csv("SP Tickers.csv", col_names = c("symbol")) |> unique()
+\end{minted}
+
+\noindent\textbf{Lines 1-3}: We load the required packages
+
+\begin{itemize}
+  \item \texttt{tidyverse} is a collection of packages for data manipulation
+  \item \texttt{furrr} is used for parallel processing
+  \item \texttt{NasdaqDataLink} is used to fetch stock data from Nasdaq.
+\end{itemize}
+
+\noindent\textbf{Line 7}: The API key for Nasdaq Data Link is set to authenticate the requests.\\
+\noindent\textbf{Line 10} We read the stock symbols from the provided CSV file and remove duplicates, ensuring each symbol appears once.\\
+\textbf{Note:} \texttt{|>} is called the \textbf{pipe} operator, that takes the output of one function and passes it into another function as the first argument, linking together the steps for data analysis with a clean syntax.
+
+\subsection{Fetching Stock Data}
+Next, we use the \texttt{future\_map\_dfr} function from the \texttt{furrr} package to
+fetch stock data for each symbol. The \texttt{NasdaqDataLink.datatable}
+function retrieves the historical data for each stock.
+
+\begin{minted}{r}
+# Enable parallel processing
+plan(multisession, workers = 12)
+# Fetch stock data for each symbol
+stocks <- symbols$symbol |>
+  future_map_dfr(function(symbol) {
+    NasdaqDataLink.api_key("your-API-key")
+    tryCatch(
+      NasdaqDataLink.datatable(
+        "SHARADAR/SEP", 
+        ticker = symbol, 
+        qopts.columns = c(
+          "ticker", 
+          "date", 
+          "open", 
+          "high", 
+          "low", 
+          "close", 
+          "volume"
+        )
+      ),
+      warning = function(w) {
+        print(w)
+        return(NULL)
+      },
+      error = function(e) {
+        print(e)
+        return(NULL)
+      },
+      finally = print(str_glue("Fetched data for {symbol}"))
+    )
+  }) |>
+  as_tibble()
+\end{minted}
+\textbf{Line 2}: The \texttt{plan()} function is used to configure how parallel function calls from `\texttt{furrr}' are resolved. In this case, `\texttt{multisession}' will resolve the function in parallel using 12 R sessions running in the background on the same machine.\\
+\textbf{Lines 4-32}: For each symbol, the `\texttt{tryCatch}' block ensures that any errors or warnings are captured (e.g., if a symbol can't be fetched from the API), preventing the entire process from failing. The function `\texttt{NasdaqDataLink.datatable}' is called with the parameters that specify the columns to retrieve (open, high, low, close, volume). Then data is then stored as a `tibble', \texttt{Tidyverse}'s analogue to a dataframe.
+
+\subsection{Excluding stocks not in the S\&P 500}
+Next, we ensure that the data for each stock is only included for the period it
+was part of the S\&P 500. This is done by filtering based on the dates provided
+in the ``SP Additions.csv" and ``SP Removals.csv" files.
+
+\begin{minted}{r}
+# Load additions data
+additions <- read_csv(
+  "SP Additions.csv",
+  col_types = cols(
+    symbol = col_character(),
+    `date added` = col_date("%m/%d/%Y")
+  )
+)
+# Load removals data
+removals <- read_csv(
+  "SP Removals.csv",
+  col_types = cols(
+    symbol = col_character(),
+    `date removed` = col_date("%m/%d/%Y")
+  )
+)
+\end{minted}
+\textbf{Line 13-15}: The `SP Additions.csv' file contains the date each stock was added to the S\&P 500.\\
+\textbf{Line 16-18}: The `SP Removals.csv' file contains the date each stock was removed from the S\&P 500.
+
+\begin{minted}{r}
+# Filter stock data to only include dates
+# when the stock was part of the S&P500
+stocks <- stocks |>
+  left_join(
+    additions,
+    by = join_by(ticker == symbol),
+    relationship = "many-to-many"
+  ) |>
+  left_join(
+    removals,
+    by = join_by(ticker == symbol),
+    relationship = "many-to-many"
+  )
+
+stocks <- stocks |>
+  filter(
+    date >= coalesce(`date added`, as_date("2000-12-31")) &
+    date < coalesce(`date removed`, as_date("2100-12-31"))
+  ) |>
+  select(ticker:volume) |>
+  arrange(ticker, desc(date))
+\end{minted}
+\textbf{Lines 2-12}: After loading the additions and removals data, the \texttt{left\_join} function combines this data with the stock data, matching rows in each table by ticker symbol.\\
+\textbf{Lines 14-20}: Then, we filter the stock data to include only the period when the stock was in the S\&P 500 by comparing each stock's `date' with its `date added' and `date removed'.\\
+After filtering, the `date added' and `date removed' columns are discarded, and the data frame is sorted by ticker (ascending) and date (descending).
+
+\section{Q1: Incorporating Financial Sector Information}
+The next task is to add the financial sector (e.g., healthcare, energy) for
+each stock. This information is provided in the ``sectors.csv" file.
+
+\begin{minted}{r}
+# Load sector data
+sectors <- read_csv("sectors.csv")
+
+# Join sector data with stock data
+stocks <- stocks |> left_join(sectors, by = join_by(ticker == symbol))
+\end{minted}
+\textbf{Line 2}: We load the sector data from the "sectors.csv" file, which contains the sector for each stock (e.g. ``financial,'' ``healthcare'', etc.).\\
+\textbf{Line 5}: The \texttt{left\_join} function adds the sector information to the stock data by joining rows with the same ticker symbol.
+
+\section{Q2: Incorporating Insider Trading Data}
+The second task involves adding insider trading data for each
+stock and summarizing it into meaningful indicators. We fetch the insider trading
+data from Sharadar's ``SF2" dataset.
+
+\begin{minted}{r}
+# Fetch insider trading data for each stock
+start_date <- "2015-01-01"
+insider_data <- symbols$symbol |>
+  future_map_dfr(function(symbol) {
+    NasdaqDataLink.api_key("your-API-key")
+    tryCatch(
+      NasdaqDataLink.datatable(
+        "SHARADAR/SF2", 
+        ticker = symbol,
+        filingdate.gte = start_date
+      ),
+      warning = function(w) {
+        print(w)
+        return(NULL)
+      },
+      error = function(e) {
+        print(e)
+        return(NULL)
+      },
+      finally = print(str_glue("Fetched insider data for {symbol}"))
+    )
+  }) |>
+  as_tibble()
+\end{minted}
+\textbf{Line 3-19}: Insider trading data is fetched using `\texttt{NasdaqDataLink.datatable}', with a filter to only include filings from January 1, 2015, onward (since we're only interested in the last 10 years of data).
+
+\subsection{Summarizing Insider Trading Data}
+The insider trading data is grouped by stock ticker and filing date. The goal
+is to summarize the data so that there is one observation per stock per day,
+containing meaningful indicators such as number of shares bought, sold by
+insiders, and the number of insiders involved in transactions.
+
+\begin{minted}{r}
+# Group and summarize insider trading data
+grouped_data <- insider_data |> group_by(ticker, filingdate)
+
+insider_shares_sold <- grouped_data |>
+  filter(transactionshares < 0) |>
+  summarize(insider_shares_sold = sum(abs(transactionshares)))
+
+insider_shares_bought <- grouped_data |>
+  filter(transactionshares >= 0) |>
+  summarize(insider_shares_bought = sum(transactionshares))
+
+insiders_trading <- grouped_data |>
+  distinct(ownername) |>
+  summarize(insiders_trading = n())
+\end{minted}
+The insider trading data is grouped by \texttt{ticker} and \texttt{filingdate}, ensuring that all transactions for a given stock on a specific date are processed together.
+
+\begin{itemize}
+  \item \textbf{Lines 4-6}: The dataset is filtered to include only transactions where insiders sold shares (\texttt{transactionshares < 0}). The absolute values of shares sold are summed to calculate the total number of shares sold by insiders on that date.
+  \item \textbf{Lines 8-10}: Similarly, transactions where insiders purchased shares (\texttt{transactionshares >= 0}) are filtered. The total number of shares bought by insiders on the given date is computed.
+  \item \textbf{Lines 12-14}: The number of unique insiders involved in transactions for a given stock on a particular date is determined using \texttt{distinct(ownername)}. This calculates the number of different insiders trading on that day.
+\end{itemize}
+
+\begin{minted}{r}
+# Merge insider trading data into stock data
+insider_summary <- insider_shares_sold |>
+  full_join(insider_shares_bought, by = join_by(ticker, filingdate)) |>
+  full_join(insiders_trading, by = join_by(ticker, filingdate))
+
+stocks <- stocks |>
+  left_join(insider_summary, by = join_by(ticker, date == filingdate)) |>
+  mutate(across(where(is.numeric), ~coalesce(.x, 0)))
+\end{minted}
+\textbf{Lines 2-4}: Merge all the insider trading data together into a single tibble.\\
+\textbf{Lines 6-8}: Merge the insdier trading data together with the original stock data. We use the function `\texttt{colaesce}' to replace \texttt{NA} observations with 0.
+
+\section{Q3: Integrating the Daily Dataset from the Sharadar Core US Fundamentals Data}
+
+In this part of the assignment, we enhance our daily stock repository by
+merging additional data from Sharadar’s Daily dataset. The goal is to enrich
+each stock–day observation with key market metrics—specifically, market
+capitalization (\texttt{marketcap}), price-to-earnings ratio (\texttt{pe}), and
+price-to-sales ratio (\texttt{ps}). Such metrics are valuable because:
+
+\begin{itemize}
+  \item \textbf{Market Capitalization:} Provides an indication of a company’s size and liquidity.
+  \item \textbf{PE and PS Ratios:} Offer insight into valuation, helping to inform trading decisions and portfolio risk assessment.
+\end{itemize}
+
+By integrating these data points, we can perform more in-depth analyses such as valuation checks, liquidity assessments, or even develop more refined trading signals.
+
+\begin{minted}{r}
+# Fetch Data and Set the API key for Nasdaq Data Link
+daily_data <- symbols$symbol |> future_map_dfr(function(symbol) {
+  NasdaqDataLink.api_key("your-API-key")
+\end{minted}
+\begin{itemize}
+  \item We begin with our list of stock symbols and then using \verb|future_map_dfr|, we concurrently fetch each stock’s daily data and merge the results into one data frame. We also set the API key inside each call, because the `\texttt{furrr}' package does not properly capture the API key from the global context.
+\end{itemize}
+
+\begin{minted}{r}
+# Fetch daily data with error handling
+tryCatch(
+  # Retrieve specified columns from the Sharadar DAILY dataset
+  NasdaqDataLink.datatable(
+    "SHARADAR/DAILY",        
+    ticker = symbol,         
+    qopts.columns = c("ticker", "date", "marketcap", "pe", "ps")  
+  ),
+  # Warning handler 
+  warning = function(w) {
+    print(w)
+    return(NULL)
+  },
+  # Error handler 
+  error = function(e) {
+    print(e)
+    return(NULL)
+  },
+  # Finally close and output conversion
+  finally = print(str_glue("Fetched daily data for {symbol}"))
+)
+}) |> as_tibble() 
+\end{minted}
+
+\begin{itemize}
+  \item \textbf{Lines 4-8} We retrieve the required columns from the Sharadar DAILY Dataset by defining them in the datatable.
+  \item \textbf{Lines 10-13} A warning handler is defined in case of any warnings issued during execution and returns a NULL value
+  \item \textbf{Lines 15-18} Similarly to handle errors in execution, we define an error handler to print out errors and return NULL value if found
+  \item \textbf{Line 20} We print a confirmation message indicating that data for the current symbol has been processed. This is helpful for tracking progress and subsequently we convert the output into a tibble for further processing. Tibble format makes manipulation with tidyverse functions easier and more consistent.
+\end{itemize}
+
+\begin{minted}{r}
+# Merge fetched data
+stocks <- stocks |> left_join(daily_data, by = join_by(ticker, date))
+\end{minted}
+\begin{itemize}
+  \item Finally, we combine the fetched \texttt{daily\_data} with our main \texttt{stocks} dataset using a left join on the \texttt{ticker} and \texttt{date} columns.
+
+        This adds useful market information to our stock data. Now that we have
+        \texttt{marketcap}, we can also calculate the number of shares by dividing it
+        by the closing price.
+
+        This shows how extra data from Sharadar can be used to make better trading
+        decisions as required in the question.
+\end{itemize}
+\end{document}
