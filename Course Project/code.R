@@ -18,6 +18,8 @@ library(TTR)
 
 options(scipen = 999)
 rm(list = ls())
+current_path <- rstudioapi::getActiveDocumentContext()$path
+setwd(dirname(current_path))
 
 # ---------------------------
 # API Key & IB Port
@@ -138,9 +140,88 @@ signals <- indicator_data |>
   filter(date == last_date & (long_signal == 1 | short_signal == 1))
 
 # ---------------------------
+# Simulate Trades (Post-Trade Evaluation)
+# ---------------------------
+
+simulate_trades <- function(signals_df, initial_equity = 100000, max_trade = 5000) {
+  required_cols <- c("symbol", "date", "open", "close")
+  if (!all(required_cols %in% colnames(signals_df))) {
+    stop(paste("Missing columns in signals_df:", paste(setdiff(required_cols, colnames(signals_df)), collapse = ", ")))
+  }
+
+  trade_dates <- sort(unique(signals_df$date))
+  equity <- initial_equity
+
+  daily_returns <- tibble(date = trade_dates, equity = NA_real_, daily_return = NA_real_)
+  trade_log <- tibble(date = as.Date(character()), symbol = character(),
+                      trade_type = character(), trade_amount = double(),
+                      buy_price = double(), sell_price = double(),
+                      shares = double(), tx_cost = double(),
+                      gross_revenue = double(), net_revenue = double(),
+                      trade_return = double())
+
+  for (i in seq_along(trade_dates)) {
+    current_date <- trade_dates[i]
+    trades_today <- signals_df %>% filter(date == current_date)
+
+    if (nrow(trades_today) == 0) {
+      daily_returns$equity[i] <- equity
+      daily_returns$daily_return[i] <- 0
+      next
+    }
+
+    for (j in 1:nrow(trades_today)) {
+      row <- trades_today[j, ]
+
+      trade_type <- NA
+      if (!is.na(row$long_signal) && row$long_signal) {
+        trade_type <- "long"
+        buy_price <- row$open
+        sell_price <- row$close
+        trade_return <- (sell_price - buy_price) / buy_price
+      } else if (!is.na(row$short_signal) && row$short_signal) {
+        trade_type <- "short"
+        buy_price <- row$close
+        sell_price <- row$open
+        trade_return <- (buy_price - sell_price) / buy_price
+      } else {
+        next
+      }
+
+      shares <- min(max_trade, equity * 0.05) / buy_price
+      tx_cost <- 2 * (1 + (shares * 0.005))
+      gross_revenue <- shares * sell_price
+      net_revenue <- gross_revenue - tx_cost
+
+      equity <- equity - (shares * buy_price) + net_revenue
+
+      trade_log <- trade_log %>% add_row(
+        date = current_date,
+        symbol = row$symbol,
+        trade_type = trade_type,
+        trade_amount = shares * buy_price,
+        buy_price = buy_price,
+        sell_price = sell_price,
+        shares = shares,
+        tx_cost = tx_cost,
+        gross_revenue = gross_revenue,
+        net_revenue = net_revenue,
+        trade_return = trade_return
+      )
+    }
+
+    daily_returns$equity[i] <- equity
+    daily_returns$daily_return[i] <- if (i == 1) 0 else (equity - daily_returns$equity[i - 1]) / daily_returns$equity[i - 1]
+  }
+
+  return(list(equity_curve = daily_returns, trade_log = trade_log))
+}
+
+# ---------------------------
 # Connect to Interactive Brokers and Get Portfolio Info
 # ---------------------------
-tws <- tryCatch(twsConnect(port = IBport, clientId = 1001), error = function(e) NULL) # Change client ID for every run
+
+tws <- tryCatch(twsConnect(port = IBport, clientId = 1008), error = function(e) NULL) # Change client ID for every run
 if (is.null(tws)) stop("Unable to connect to TWS")
 
 account_info <- reqAccountUpdates(tws)
@@ -253,12 +334,10 @@ if (choice != "E") {
   trades <- trades[-c(1:nrow(trades)), ]
 }
 
-signals <- trades
-
 # ---------------------------
 # Execute Orders
 # ---------------------------
-for (i in 1:nrow(signals)) {
+for (i in 1:nrow(trades)) {
   sym <- signals$symbol[i]
   pos <- signals$position[i]
   action <- ifelse(sym %in% indicator_data$symbol & indicator_data$long_signal[indicator_data$symbol == sym & indicator_data$date == last_date][1] == 1, "BUY", "SELL")
@@ -302,8 +381,95 @@ for (i in 1:nrow(signals)) {
 }
 
 # ---------------------------
+# Evaluate Performance (Backtest-style Post Analysis)
+# ---------------------------
+
+# Post-trade backtesting is added to production script to evaluate and track the
+# performance of executed trades using same metrics as in the original backtest.
+
+if (nrow(signals) > 0) {
+  signals <- signals |> mutate(date = last_date, open = price, close = price)  # Synthetic prices for evaluation
+  result <- simulate_trades(signals, initial_equity = portfolio_value, max_trade = max_trade)
+  
+  equity_curve <- result$equity_curve
+  trade_log <- result$trade_log
+
+  print(glimpse(trade_log))
+  print(glimpse(equity_curve))
+
+  cat("\nFinal Equity:", tail(equity_curve$equity, 1), "\n")
+  cat("Total Return (%):", round((tail(equity_curve$equity, 1) - portfolio_value) / portfolio_value * 100, 2), "\n")
+}
+
+# ---------------------------
 # Disconnect TWS
 # ---------------------------
 twsDisconnect(tws)
 
 cat("\nAll trades submitted. Review IB TWS for confirmation.\n")
+
+# ---------------------------
+# Fetch Portfolio Performance
+# ---------------------------
+
+evaluate_portfolio_performance <- function(IBport) {
+  # ---------------------------
+  # Connect to IB with Random Client ID
+  # ---------------------------
+  client_id <- sample(1000:9999, 1)  # Random ID between 1000 and 9999
+  tws <- tryCatch(twsConnect(port = IBport, clientId = client_id), error = function(e) NULL)
+  if (is.null(tws)) {
+    cat("Unable to connect to Interactive Brokers TWS.\n")
+    return(invisible(NULL))
+  }
+
+  # ---------------------------
+  # Fetch Updated Portfolio Info
+  # ---------------------------
+  account_info <- reqAccountUpdates(tws)
+  open_positions <- account_info[[2]]  # Get latest open positions
+
+  cat("\n------ Portfolio Performance Summary ------\n")
+
+  if (!is.null(open_positions) && length(open_positions) > 0) {
+    portfolio_summary <- tibble(
+      Symbol = character(),
+      Position = numeric(),
+      Market_Price = numeric(),
+      Avg_Cost = numeric(),
+      Market_Value = numeric(),
+      Unrealized_PnL = numeric()
+    )
+
+    for (pos in open_positions) {
+      contract <- pos$contract
+      symbol <- contract$symbol
+      position_size <- pos$portfolioValue$position
+      market_price <- pos$portfolioValue$marketPrice
+      market_value <- pos$portfolioValue$marketValue
+      avg_cost <- pos$portfolioValue$averageCost
+      unrealized_pnl <- pos$portfolioValue$unrealizedPNL
+
+      portfolio_summary <- portfolio_summary %>% add_row(
+        Symbol = symbol,
+        Position = position_size,
+        Market_Price = round(market_price, 4),
+        Avg_Cost = round(avg_cost, 4),
+        Market_Value = round(market_value, 4),
+        Unrealized_PnL = round(unrealized_pnl, 4)
+      )
+    }
+
+    print(portfolio_summary)
+  } else {
+    cat("No open positions in portfolio.\n")
+  }
+
+  # ---------------------------
+  # Disconnect Cleanly
+  # ---------------------------
+  twsDisconnect(tws)
+  cat("\nDisconnected from TWS.\n")
+}
+
+evaluate_portfolio_performance(IBport)
